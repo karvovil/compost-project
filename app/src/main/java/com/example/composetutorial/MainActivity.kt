@@ -32,29 +32,87 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composetutorial.ui.theme.ComposeTutorialTheme
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Profile(val name: String)
+@Serializable
+object Conversation
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             ComposeTutorialTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    MessageCard(Message("And droid", "jetpack compost"))
-                    Conversation(SampleData.conversationSample)
-                }
+                MyApp()
             }
         }
     }
 }
+
+@Composable
+fun MyApp() {
+    val navController = rememberNavController()
+    NavHost(navController, startDestination = Profile(name = "LeXXXi")) {
+        composable<Profile> { backStackEntry ->
+            val profile: Profile = backStackEntry.toRoute()
+            ProfileScreen(
+                profile = profile,
+                onNavigateToConversation = {
+                    navController.navigate(route = Conversation)
+                }
+            )
+        }
+        composable<Conversation> {
+            ConversationScreen(
+                SampleData.conversationSample,
+                onNavigateToProfile = {
+                    navController.navigate(
+                        route = Profile(name = "LeXXXi")
+                    )
+                }
+            )
+        }
+
+    }
+}
+@Composable
+fun ProfileScreen(
+    profile: Profile,
+    onNavigateToConversation: () -> Unit,
+) {
+    Text("Profile for ${profile.name}")
+    Button(onClick = { onNavigateToConversation() }) {
+        Text("Go to conversation")
+    }
+}
+
+@Composable
+fun ConversationScreen(
+    messages: List<Message>,
+    onNavigateToProfile: () -> Unit
+) {
+    LazyColumn {
+        items(messages) { message ->
+            MessageCard(message, onNavigateToProfile = onNavigateToProfile)
+        }
+    }
+}
+
 data class Message(val author: String, val body: String)
 
 @Composable
-fun MessageCard(msg: Message) {
+fun MessageCard(msg: Message, onNavigateToProfile: () -> Unit) {
     Row(modifier = Modifier.padding(all = 10.dp)) {
         Image(
             painter = painterResource(R.drawable.profile_picture),
@@ -63,6 +121,7 @@ fun MessageCard(msg: Message) {
                 .size(40.dp)
                 .clip(shape = CircleShape)
                 .border(1.8.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                .clickable { onNavigateToProfile() }
         )
         Spacer(modifier = Modifier.width(10.dp))
         var isExpanded by remember { mutableStateOf(false) }
@@ -93,20 +152,15 @@ fun MessageCard(msg: Message) {
         }
     }
 }
-@Composable
-fun Conversation(messages: List<Message>) {
-    LazyColumn {
-        items(messages) { message ->
-            MessageCard(message)
-        }
-    }
-}
 
 @Preview
 @Composable
 fun PreviewConversation() {
     ComposeTutorialTheme {
-        Conversation(SampleData.conversationSample)
+        ConversationScreen(
+            messages = SampleData.conversationSample,
+            onNavigateToProfile = {}
+        )
     }
 }
 
@@ -117,5 +171,5 @@ fun PreviewConversation() {
 fun PreviewMessageCard() {
     ComposeTutorialTheme {
         Surface {
-    MessageCard(msg = Message("Lexxxi", "Hey, take a look at Jetpack Compose, it's great!"))
+    MessageCard(onNavigateToProfile = {}, msg = Message("LeXXXi", "Hey, take a look at Jetpack Compose, it's great!"))
 }}}
