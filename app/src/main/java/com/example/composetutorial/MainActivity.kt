@@ -37,7 +37,9 @@ fun MyApp() {
             ProfileScreen(
                 profile = profile,
                 onNavigateToConversation = {
-                    navController.navigate(route = Conversation)
+                    navController.navigate(route = Conversation){
+                        popUpTo(Conversation){inclusive = true}
+                    }
                 }
             )
         }
@@ -45,12 +47,9 @@ fun MyApp() {
             ConversationScreen(
                 SampleData.conversationSample,
                 onNavigateToProfile = {
-                    navController.navigate(
-                        route = Profile(name = "LeXXXi")
-                    )
+                    navController.navigate(route = Profile(name = "LeXXXi"))
                 }
             )
         }
     }
 }
-
