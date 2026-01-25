@@ -20,6 +20,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -41,7 +43,11 @@ fun ProfileScreen(
     ) { uri ->
         saveToAppStorage(context, uri, profilePicFile)
         profilePicBitmap = BitmapFactory.decodeFile(profilePicFile.absolutePath)
+    }
 
+    val prefs = remember { context.getSharedPreferences("prefs", Context.MODE_PRIVATE) }
+    var username by remember {
+        mutableStateOf(prefs.getString("username", "LeXXXi") ?: "LeXXXi")
     }
 
     Column {
@@ -53,11 +59,23 @@ fun ProfileScreen(
                 .clip(shape = CircleShape)
                 .border(1.8.dp, MaterialTheme.colorScheme.primary, CircleShape)
         )
-        Text(
-            text = "Profile for ${profile.name}",
-            color = MaterialTheme.colorScheme.secondary,
-            style = MaterialTheme.typography.titleMedium
-        )
+        Row {
+
+            Text(
+                text = "Profile for ",
+                color = MaterialTheme.colorScheme.secondary,
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            TextField(
+                value = username,
+                onValueChange = { newName ->
+                    username = newName
+                    prefs.edit().putString("username", newName).apply()
+                }
+            )
+        }
+
         Button(onClick = { onNavigateToConversation() }) {
             Text(text = "Go to conversation")
         }

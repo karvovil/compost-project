@@ -1,5 +1,6 @@
 package com.example.composetutorial
 
+import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -41,6 +42,10 @@ fun MessageCard(msg: Message, onNavigateToProfile: () -> Unit) {
     var profilePicBitmap by remember {
         mutableStateOf(BitmapFactory.decodeFile(profilePicFile.absolutePath))
     }
+    val prefs = remember { context.getSharedPreferences("prefs", Context.MODE_PRIVATE) }
+    var username by remember {
+        mutableStateOf(prefs.getString("username", "LeXXXi") ?: "LeXXXi")
+    }
     Row(modifier = Modifier.padding(all = 10.dp)) {
         Image(
             bitmap = profilePicBitmap.asImageBitmap(),
@@ -58,7 +63,7 @@ fun MessageCard(msg: Message, onNavigateToProfile: () -> Unit) {
         )
         Column(modifier = Modifier.clickable { isExpanded = !isExpanded }) {
             Text(
-                text = msg.author,
+                text = username,
                 color = MaterialTheme.colorScheme.secondary,
                 style = MaterialTheme.typography.titleMedium
             )
