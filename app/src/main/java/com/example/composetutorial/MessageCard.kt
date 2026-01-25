@@ -24,18 +24,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composetutorial.ui.theme.ComposeTutorialTheme
+import java.io.File
+import android.graphics.BitmapFactory
+import androidx.compose.ui.graphics.asImageBitmap
 
 data class Message(val author: String, val body: String)
 
 @Composable
 fun MessageCard(msg: Message, onNavigateToProfile: () -> Unit) {
+    val context = LocalContext.current
+    val profilePicFile = remember { File(context.filesDir, "profilePic.jpg") }
+    var profilePicBitmap by remember {
+        mutableStateOf(BitmapFactory.decodeFile(profilePicFile.absolutePath))
+    }
     Row(modifier = Modifier.padding(all = 10.dp)) {
         Image(
-            painter = painterResource(R.drawable.profile_picture),
+            bitmap = profilePicBitmap.asImageBitmap(),
             contentDescription = "Contact profile picture",
             modifier = Modifier
                 .size(40.dp)
