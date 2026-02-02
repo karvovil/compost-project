@@ -1,11 +1,13 @@
 package com.example.composetutorial
 
-import SampleData
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import com.example.composetutorial.ui.theme.ComposeTutorialTheme
 import androidx.navigation.compose.NavHost
@@ -22,8 +24,12 @@ object Conversation
 data class Profile(val name: String)
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val serviceIntent = Intent(this, SensorService::class.java)
+        startForegroundService(serviceIntent)
 
         val avatarFile = File(filesDir, "profilePic.jpg")
         if (!avatarFile.exists()) {
